@@ -32,6 +32,7 @@ import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -823,7 +824,7 @@ public class DefaultConfigTest {
   }
 
   @Test
-  public void testGetPropertyNames() {
+  public void testGetPropertyNames() throws IOException {
     String someKeyPrefix = "someKey";
     String someValuePrefix = "someValue";
 
@@ -844,7 +845,7 @@ public class DefaultConfigTest {
   }
 
   @Test
-  public void testGetPropertyNamesWithOrderedProperties() {
+  public void testGetPropertyNamesWithOrderedProperties() throws IOException {
     String someKeyPrefix = "someKey";
     String someValuePrefix = "someValue";
 
@@ -871,7 +872,7 @@ public class DefaultConfigTest {
   }
 
   @Test
-  public void testGetPropertyNamesWithNullProp() {
+  public void testGetPropertyNamesWithNullProp() throws IOException {
     when(configRepository.getConfig()).thenReturn(null);
 
     DefaultConfig defaultConfig =
@@ -912,7 +913,7 @@ public class DefaultConfigTest {
   }
 
   @Test
-  public void testLoadFromRepositoryFailedAndThenRecovered() {
+  public void testLoadFromRepositoryFailedAndThenRecovered() throws IOException {
     String someKey = "someKey";
     String someValue = "someValue";
     String someDefaultValue = "someDefaultValue";

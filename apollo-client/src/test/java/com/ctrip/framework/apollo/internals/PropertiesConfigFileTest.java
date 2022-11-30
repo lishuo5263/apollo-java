@@ -28,6 +28,8 @@ import com.ctrip.framework.apollo.enums.PropertyChangeType;
 import com.ctrip.framework.apollo.model.ConfigFileChangeEvent;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
 import com.google.common.util.concurrent.SettableFuture;
+
+import java.io.IOException;
 import java.util.Properties;
 
 import java.util.concurrent.TimeUnit;
@@ -169,7 +171,7 @@ public class PropertiesConfigFileTest {
   }
 
   @Test
-  public void testIfCompatibleWithProperties() {
+  public void testIfCompatibleWithProperties() throws IOException {
     Properties someProperties = new Properties();
     String someKey = "someKey";
     String someValue = "someValue";
@@ -187,7 +189,7 @@ public class PropertiesConfigFileTest {
   }
 
   @Test
-  public void testIfCompatibleWithEmptyProperties() {
+  public void testIfCompatibleWithEmptyProperties() throws IOException {
     Properties someProperties = new Properties();
 
     when(configRepository.getConfig()).thenReturn(someProperties);

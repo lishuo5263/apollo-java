@@ -92,6 +92,24 @@
 			<artifactId>log4j-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>2.0.20</version>
+		</dependency>
 		<!-- end of test -->
 	</dependencies>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<name>Nexus Releases</name>
+			<url>http://nexus.huobidev.com:8081/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>Nexus Snapshots</name>
+			<url>http://nexus.huobidev.com:8081/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

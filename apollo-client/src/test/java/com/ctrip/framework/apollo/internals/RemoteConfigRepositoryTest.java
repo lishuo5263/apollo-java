@@ -154,6 +154,20 @@ public class RemoteConfigRepositoryTest {
   }
 
   @Test
+  public void testLoadNacosConfigWithOrderedProperties() throws Exception {
+    String someKey = "someKey";
+    String someValue = "someValue";
+    Map<String, String> configurations = Maps.newLinkedHashMap();
+    configurations.put(someKey, someValue);
+    configurations.put("someKey2", "someValue2");
+    someNamespace="devops.lishuo-properties";
+    System.setProperty("NacosNamespace","public");
+    RemoteConfigRepository remoteConfigRepository = new RemoteConfigRepository(someNamespace);
+
+    assertNotNull(remoteConfigRepository.getConfig());
+  }
+
+  @Test
   public void testLoadConfigWithOrderedProperties() throws Exception {
     String someKey = "someKey";
     String someValue = "someValue";

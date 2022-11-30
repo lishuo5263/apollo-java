@@ -17,6 +17,8 @@
 package com.ctrip.framework.apollo.internals;
 
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -27,7 +29,7 @@ public interface ConfigRepository {
    * Get the config from this repository.
    * @return config
    */
-  Properties getConfig();
+  Properties getConfig() throws IOException;
 
   /**
    * Set the fallback repo for this repository.

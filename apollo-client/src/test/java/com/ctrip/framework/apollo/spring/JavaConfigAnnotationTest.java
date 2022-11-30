@@ -386,7 +386,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
 
   @Test
   public void testApolloConfigChangeListenerWithInterestedKeyPrefixes_fire()
-      throws InterruptedException {
+          throws InterruptedException, IOException {
     // default mock, useless here
     // just for speed up test without waiting
     mockConfig(ConfigConsts.NAMESPACE_APPLICATION, mock(Config.class));
@@ -495,7 +495,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
    * application.
    */
   @Test
-  public void testApolloConfigChangeListenerResolveExpressionFromApplicationNamespace() {
+  public void testApolloConfigChangeListenerResolveExpressionFromApplicationNamespace() throws IOException {
     final String namespaceKey = "mysql.namespace";
     final String namespaceName = "magicMysqlNamespaceApplication";
 
@@ -568,7 +568,7 @@ public class JavaConfigAnnotationTest extends AbstractSpringIntegrationTest {
   }
 
   @Test
-  public void testApolloConfigResolveExpressionFromApolloConfigNamespaceApplication() {
+  public void testApolloConfigResolveExpressionFromApolloConfigNamespaceApplication() throws IOException {
 
     final String namespaceName = "xxx6";
     final String yamlNamespaceName = "yyy8.yml";

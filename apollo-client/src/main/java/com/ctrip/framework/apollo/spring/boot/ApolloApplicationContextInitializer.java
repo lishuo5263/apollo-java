@@ -143,7 +143,7 @@ public class ApolloApplicationContextInitializer implements
     }
     for (String namespace : namespaceList) {
       Config config = ConfigService.getConfig(namespace);
-
+      //((DefaultConfig) config).m_configProperties.get().getProperty("content")
       composite.addPropertySource(configPropertySourceFactory.getConfigPropertySource(namespace, config));
     }
     if (!configUtil.isOverrideSystemProperties()) {

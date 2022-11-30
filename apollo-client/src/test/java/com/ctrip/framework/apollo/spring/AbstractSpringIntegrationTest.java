@@ -85,7 +85,7 @@ public abstract class AbstractSpringIntegrationTest {
     doTearDown();
   }
 
-  protected SimpleConfig prepareConfig(String namespaceName, Properties properties) {
+  protected SimpleConfig prepareConfig(String namespaceName, Properties properties) throws IOException {
     ConfigRepository configRepository = mock(ConfigRepository.class);
 
     when(configRepository.getConfig()).thenReturn(properties);
@@ -113,7 +113,7 @@ public abstract class AbstractSpringIntegrationTest {
     return properties;
   }
 
-  protected static YamlConfigFile prepareYamlConfigFile(String namespaceNameWithFormat, Properties properties) {
+  protected static YamlConfigFile prepareYamlConfigFile(String namespaceNameWithFormat, Properties properties) throws IOException {
     ConfigRepository configRepository = mock(ConfigRepository.class);
 
     when(configRepository.getConfig()).thenReturn(properties);

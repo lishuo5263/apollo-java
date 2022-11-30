@@ -14,24 +14,18 @@
  * limitations under the License.
  *
  */
-package com.ctrip.framework.apollo.enums;
+package com.ctrip.framework.apollo.util.http;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
- * To indicate the config's source type, i.e. where is the config loaded from
- *
- * @since 1.1.0
+ * @author Jason Song(song_s@ctrip.com)
  */
-public enum ConfigSourceType {
-  REMOTE("Loaded from remote config service"), LOCAL("Loaded from local cache"), NONE("Load failed"),
-  YAML("yaml"),YML("yml"),XML("xml"),JSON("json");
 
-  private final String description;
-
-  ConfigSourceType(String description) {
-    this.description = description;
-  }
-
-  public String getDescription() {
-    return description;
-  }
+@Getter
+@AllArgsConstructor
+public class HttpNacosResponse {
+  private final int m_statusCode;
+  private final Object nacosConfigResult;
 }

@@ -18,6 +18,8 @@ package com.ctrip.framework.apollo.internals;
 
 import com.ctrip.framework.apollo.build.ApolloInjector;
 import com.ctrip.framework.apollo.util.factory.PropertiesFactory;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -49,7 +51,7 @@ public abstract class AbstractConfigRepository implements ConfigRepository {
     return false;
   }
 
-  protected abstract void sync();
+  protected abstract void sync() throws IOException;
 
   @Override
   public void addChangeListener(RepositoryChangeListener listener) {
