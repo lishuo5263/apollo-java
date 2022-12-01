@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions;
 
 public class PropertiesCompatibleFileConfigRepository extends AbstractConfigRepository implements
     ConfigFileChangeListener {
-  private final PropertiesCompatibleConfigFile configFile;
+  public final PropertiesCompatibleConfigFile configFile;
   private volatile Properties cachedProperties;
 
   public PropertiesCompatibleFileConfigRepository(PropertiesCompatibleConfigFile configFile) {

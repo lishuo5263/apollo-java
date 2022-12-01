@@ -33,6 +33,7 @@ import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.enums.NacosConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigStatusCodeException;
+import com.ctrip.framework.apollo.spring.util.FileTransferUtils;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
@@ -286,8 +287,8 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                 //exceptNamespace is not load nacos config
                 if (Optional.ofNullable(System.getProperty("format")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()) {
                     final String[] split = System.getProperty("nacosLoadNamespace").split(",");
-                    for (int j = 0; j < split.length; j++) {
-                        if (m_namespace.equalsIgnoreCase(split[j])) { // need load nacos
+                    for (String s : split) {
+                        if (m_namespace.equalsIgnoreCase(s)) { // need load nacos
                             //nacos config fetch
                             //namespace -> dataId
                             //appId -> group
@@ -308,11 +309,13 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
                             NacosConfigSourceType nacosConfigSourceType = NacosConfigSourceType.getEnumByMsg(System.getProperty("format"));
                             final Map<String, String> configurations = new HashMap<>();
-                            switch (Objects.requireNonNull(nacosConfigSourceType)){
+                            switch (Objects.requireNonNull(nacosConfigSourceType)) {
                                 case YAML:
+                                case YML:
                                     //todo accroding format type to handle nacos data
                                     //yaml data final convert properties
-                                    break ;
+                                    FileTransferUtils.yml2Properties(nacosResult, configurations);
+                                    break;
                                 case PROPERTIES:
                                     //properties
                                     Properties proper = new Properties();
@@ -323,7 +326,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                                         String strValue = proper.getProperty(strKey);
                                         configurations.put(strKey, strValue);
                                     }
-                                    break ;
+                                    break;
                             }
 
                             return ApolloConfig.builder()
