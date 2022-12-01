@@ -30,6 +30,7 @@ import com.ctrip.framework.apollo.core.utils.ApolloThreadFactory;
 import com.ctrip.framework.apollo.core.utils.DeferredLoggerFactory;
 import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.enums.ConfigSourceType;
+import com.ctrip.framework.apollo.enums.NacosConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigStatusCodeException;
 import com.ctrip.framework.apollo.tracer.Tracer;
@@ -283,7 +284,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
 
                 //exceptNamespace is not load nacos config
-                if (Optional.ofNullable(System.getProperty("xxx")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()) {
+                if (Optional.ofNullable(System.getProperty("format")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()) {
                     final String[] split = System.getProperty("nacosLoadNamespace").split(",");
                     for (int j = 0; j < split.length; j++) {
                         if (m_namespace.equalsIgnoreCase(split[j])) { // need load nacos
@@ -305,17 +306,26 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                                 //System.setProperty("exceptNamespace",split);
                             }
 
-                            //todo accroding format type to handle nacos data
-                            //yaml data final convert properties
-                            Properties proper = new Properties();
-                            proper.load(new StringReader(nacosResult)); //把字符串转为reader
-                            Enumeration enum1 = proper.propertyNames();
+                            NacosConfigSourceType nacosConfigSourceType = NacosConfigSourceType.getEnumByMsg(System.getProperty("format"));
                             final Map<String, String> configurations = new HashMap<>();
-                            while (enum1.hasMoreElements()) {
-                                String strKey = (String) enum1.nextElement();
-                                String strValue = proper.getProperty(strKey);
-                                configurations.put(strKey, strValue);
+                            switch (Objects.requireNonNull(nacosConfigSourceType)){
+                                case YAML:
+                                    //todo accroding format type to handle nacos data
+                                    //yaml data final convert properties
+                                    break ;
+                                case PROPERTIES:
+                                    //properties
+                                    Properties proper = new Properties();
+                                    proper.load(new StringReader(nacosResult)); //把字符串转为reader
+                                    Enumeration enum1 = proper.propertyNames();
+                                    while (enum1.hasMoreElements()) {
+                                        String strKey = (String) enum1.nextElement();
+                                        String strValue = proper.getProperty(strKey);
+                                        configurations.put(strKey, strValue);
+                                    }
+                                    break ;
                             }
+
                             return ApolloConfig.builder()
                                     .namespaceName(m_namespace)
                                     .appId(appId)
