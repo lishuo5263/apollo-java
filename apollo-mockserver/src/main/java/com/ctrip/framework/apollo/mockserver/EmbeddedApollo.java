@@ -131,7 +131,7 @@ public class EmbeddedApollo extends ExternalResource {
     ApolloConfig apolloConfig = new ApolloConfig("someAppId", "someCluster", namespace, "someReleaseKey");
 
     Map<String, String> mergedConfigurations = mergeOverriddenProperties(namespace, configurations);
-    apolloConfig.setConfigurations(mergedConfigurations);
+    //apolloConfig.setConfigurations(mergedConfigurations);
     return GSON.toJson(apolloConfig);
   }
 

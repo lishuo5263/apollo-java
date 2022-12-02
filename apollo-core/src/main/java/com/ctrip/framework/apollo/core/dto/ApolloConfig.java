@@ -36,7 +36,7 @@ public class ApolloConfig {
 
   private String namespaceName;
 
-  private Map<String, String> configurations;
+  private Map<String, Object> configurations;
 
   private String releaseKey;
 

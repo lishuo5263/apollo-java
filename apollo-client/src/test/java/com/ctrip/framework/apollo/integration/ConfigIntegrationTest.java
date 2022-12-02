@@ -550,7 +550,7 @@ public class ConfigIntegrationTest extends BaseIntegrationTest {
     ApolloConfig apolloConfig =
         new ApolloConfig(someAppId, someClusterName, defaultNamespace, someReleaseKey);
 
-    apolloConfig.setConfigurations(configurations);
+    //apolloConfig.setConfigurations(configurations);
 
     return apolloConfig;
   }

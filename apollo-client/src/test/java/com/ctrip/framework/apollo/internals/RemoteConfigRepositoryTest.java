@@ -384,7 +384,7 @@ public class RemoteConfigRepositoryTest {
     ApolloConfig apolloConfig =
         new ApolloConfig(someAppId, someClusterName, someNamespace, someReleaseKey);
 
-    apolloConfig.setConfigurations(configurations);
+    //apolloConfig.setConfigurations(configurations);
 
     return apolloConfig;
   }

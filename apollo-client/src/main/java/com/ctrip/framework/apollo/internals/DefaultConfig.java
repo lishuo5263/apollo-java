@@ -67,29 +67,7 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
 
   private void initialize() {
     try {
-      //apollo every type convert to properties,so here is handle nacos type
-      if (Optional.ofNullable(System.getProperty("format")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()) {
-        //yaml to property
-        NacosConfigSourceType nacosConfigSourceType = NacosConfigSourceType.getEnumByMsg(System.getProperty("format"));
-        switch (Objects.requireNonNull(nacosConfigSourceType)) {
-          case YAML:
-          case YML:
-            final String[] split = System.getProperty("nacosLoadNamespace").split(",");
-            for (String s : split) {
-              if (m_namespace.equalsIgnoreCase(s)) {
-                updateConfig(((YamlConfigFile) ((PropertiesCompatibleFileConfigRepository) m_configRepository).configFile).m_configProperties.get(),
-                        m_configRepository.getSourceType());
-              } else {
-                //this is part of configuration use nacos load ,some part use apollo load
-                updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
-              }
-            }
-            break;
-        }
-      }else {
-        //original apollo logic
-        updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
-      }
+      updateConfig(m_configRepository.getConfig(), m_configRepository.getSourceType());
     } catch (Throwable ex) {
       Tracer.logError(ex);
       logger.warn("Init Apollo Local Config failed - namespace: {}, reason: {}.",

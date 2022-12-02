@@ -33,7 +33,6 @@ import com.ctrip.framework.apollo.enums.ConfigSourceType;
 import com.ctrip.framework.apollo.enums.NacosConfigSourceType;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigException;
 import com.ctrip.framework.apollo.exceptions.ApolloConfigStatusCodeException;
-import com.ctrip.framework.apollo.spring.util.FileTransferUtils;
 import com.ctrip.framework.apollo.tracer.Tracer;
 import com.ctrip.framework.apollo.tracer.spi.Transaction;
 import com.ctrip.framework.apollo.util.ConfigUtil;
@@ -187,54 +186,6 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         return result;
     }
 
-    public static void main(String[] args) throws IOException {
-
-        String url = "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=devops.lishuo-properties&group=hello-world-default&tenant=public";
-
-        HttpRequest request = new HttpRequest(url);
-        HttpNacosResponse response = doGetWithSerializeFunction(request);
-        String nacosResult = (String) response.getNacosConfigResult();
-
-
-        //todo fix this after add content  propertySource can not get property
-        final Map<String, String> configurations = new HashMap<>();
-        configurations.put("", nacosResult);
-        final String replace = nacosResult.replace("\n", "");
-        final Object o = JSON.toJSONString(replace);
-        System.out.println(o);
-        Properties proper = new Properties();
-        proper.load(new StringReader(nacosResult)); //把字符串转为reader
-        Enumeration enum1 = proper.propertyNames();
-        Map map =new HashMap();
-        while (enum1.hasMoreElements()) {
-            String strKey = (String) enum1.nextElement();
-            String strValue = proper.getProperty(strKey);
-            map.put(strKey, strValue);
-        }
-
-        final ApolloConfig apolloConfig = JSON.toJavaObject((JSON) JSON.toJSON(nacosResult), ApolloConfig.class);
-
-
-        String result1 ="{environment = FAT\n" +
-                "    server.port = 9099\n" +
-                "    sample.timeout = 1000\n" +
-                "    sample.size = 890234723\n" +
-                "    test.input1 = ckl\n" +
-                "    test.input = ENC(Ore69lUopDHL5R8Bw/G3bQ==)\n" +
-                "    jasypt.encryptor.password = klklklklklklklkl\n" +
-                "    server.delay = 324234\n" +
-                "    applicationName = applicationNamesdf1312\n" +
-                "    james.name = devops.lishuo-properties.james.name-nacos\n" +
-                "    james.age = 999\n" +
-                "    name2 = devops.lishuo-properties.name2-nacos\n" +
-                "    }";
-        Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new StringReader(result1.toString()));
-        reader.setLenient(true);
-        ApolloConfig apolloConfig2 = gson.fromJson(reader, ApolloConfig.class);
-        System.out.println(apolloConfig2);
-    }
-
     private ApolloConfig loadApolloConfig() throws IOException {
         if (!m_loadConfigRateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
             //wait at most 5 seconds
@@ -308,18 +259,16 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                             }
 
                             NacosConfigSourceType nacosConfigSourceType = NacosConfigSourceType.getEnumByMsg(System.getProperty("format"));
-                            final Map<String, String> configurations = new HashMap<>();
+                            Map<String, Object> configurations = new HashMap<>();
                             switch (Objects.requireNonNull(nacosConfigSourceType)) {
                                 case YAML:
                                 case YML:
-                                    //todo accroding format type to handle nacos data
-                                    //yaml data final convert properties
-                                    FileTransferUtils.yml2Properties(nacosResult, configurations);
+                                    //configurations = YmlToProperties.ymlToProperties(nacosResult);
+                                    configurations.put("content", nacosResult);
                                     break;
                                 case PROPERTIES:
-                                    //properties
                                     Properties proper = new Properties();
-                                    proper.load(new StringReader(nacosResult)); //把字符串转为reader
+                                    proper.load(new StringReader(nacosResult));
                                     Enumeration enum1 = proper.propertyNames();
                                     while (enum1.hasMoreElements()) {
                                         String strKey = (String) enum1.nextElement();
