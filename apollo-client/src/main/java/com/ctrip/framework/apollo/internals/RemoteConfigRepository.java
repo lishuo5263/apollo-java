@@ -151,6 +151,9 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                 m_configUtil.getRefreshIntervalTimeUnit());
     }
 
+    //This method is very important
+    //When first progress init LocalFileConfigRepository will invoke this.
+    //Then first invoke apollo to fetch configuration RemoteConfigRepository  will invoke this, and loadApolloConfig() add -D will enhancement to fetch nacos .
     @Override
     protected synchronized void sync() throws IOException {
         Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "syncRemoteConfig");
@@ -236,16 +239,22 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
 
 
                 //exceptNamespace is not load nacos config
-                if (Optional.ofNullable(System.getProperty("format")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()) {
+                if (Optional.ofNullable(System.getProperty("format")).isPresent() && Optional.ofNullable(System.getProperty("nacosLoadNamespace")).isPresent()
+                        && Optional.ofNullable(System.getProperty("nacosAddress")).isPresent()) {
+                    logger.info("——————————————————————————————————————————————Need Replace Nacos——————————————————————————————————————————————");
+                    logger.info("Apollo namespace use -D need replace config is : {} ",System.getProperty("nacosLoadNamespace"));
+                    logger.info("——————————————————————————————————————————————Need Replace Nacos——————————————————————————————————————————————");
+
                     final String[] split = System.getProperty("nacosLoadNamespace").split(",");
-                    for (String s : split) {
-                        if (m_namespace.equalsIgnoreCase(s)) { // need load nacos
+                    List<String> handleString = new LinkedList<>(Arrays.asList(split));
+                    for (int k = 0; k < handleString.size(); k++) {
+                        if (m_namespace.equalsIgnoreCase(handleString.get(k))) { // need load nacos
                             //nacos config fetch
                             //namespace -> dataId
                             //appId -> group
                             //multiple cluster -> appId + cluster
                             //http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=broker-application.yml&group=base-common-default&tenant=hk-local-sync-pro
-                            url = "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId="
+                            url = System.getProperty("nacosAddress") + "/nacos/v1/cs/configs?dataId="
                                     + m_namespace + "&group=" + appId + "-" + cluster + "&tenant=" + System.getProperty("NacosNamespace");
 
                             HttpRequest request = new HttpRequest(url);
@@ -253,13 +262,10 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                             String nacosResult = (String) response.getNacosConfigResult();
                             logger.info("Loaded nacos config for {}: {}", m_namespace, nacosResult);
 
-                            if (split.length > 0) {
-                                //todo ex: abcd ,  c d use nacos ,here need remove c & d
-                                //System.setProperty("exceptNamespace",split);
-                            }
-
                             NacosConfigSourceType nacosConfigSourceType = NacosConfigSourceType.getEnumByMsg(System.getProperty("format"));
                             Map<String, Object> configurations = new HashMap<>();
+                            final String prepareReplace = handleString.get(k);
+                            logger.info("++++++++++++++" + prepareReplace + ": Prepare Replaced Nacos++++++++++++++");
                             switch (Objects.requireNonNull(nacosConfigSourceType)) {
                                 case YAML:
                                 case YML:
@@ -278,14 +284,21 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                                     break;
                             }
 
+                            if (handleString.remove(handleString.get(k))) {
+                                String[] latestHandleString = handleString.toArray(new String[handleString.size()]);
+                                System.setProperty("nacosLoadNamespace", org.apache.commons.lang3.StringUtils.join(latestHandleString, ","));
+                                logger.info("************** Current -DnacosLoadNamespace: " + System.getProperty("nacosLoadNamespace") + " **************");
+                                logger.info("-------------- " + prepareReplace + ": Replaced Nacos success! -------------- ");
+                            }
+
                             return ApolloConfig.builder()
                                     .namespaceName(m_namespace)
                                     .appId(appId)
                                     .cluster(cluster)
                                     .configurations(configurations)
                                     .build();
-                        } else { //use load apollo config
-                            //apollo fetch
+                        } else {
+                            //original apollo fetch
                             return originalGetApolloConfig(appId, secret, url, transaction, exception, cluster, onErrorSleepTime);
                         }
                     }
@@ -301,7 +314,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         throw new ApolloConfigException(message, exception);
     }
 
-    private ApolloConfig originalGetApolloConfig(String appId, String secret, String url, Transaction transaction,Throwable exception,String cluster, long onErrorSleepTime) {
+    private ApolloConfig originalGetApolloConfig(String appId, String secret, String url, Transaction transaction, Throwable exception, String cluster, long onErrorSleepTime) {
         try {
             HttpRequest request = new HttpRequest(url);
             if (!StringUtils.isBlank(secret)) {
